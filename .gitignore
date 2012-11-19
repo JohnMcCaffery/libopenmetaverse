@@ -1,0 +1,12 @@
+*.dll
+*.pdb
+*.sln
+*.exe
+bin/
+*obj*
+*bin*
+*.csproj
+*.user
+openjpeg-dotnet*
+compile.bat
+*.suo
