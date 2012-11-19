@@ -10,3 +10,5 @@ bin/
 openjpeg-dotnet*
 compile.bat
 *.suo
+*~
+*.config
