@@ -585,9 +585,18 @@ namespace GridProxy
             else if (new Regex(@"^/https?://.*$").Match(uri).Success)
             {
                 ProxyCaps(netStream, meth, uri.Substring(1), headers, content, reqNo);
-            } else if (new Regex(@"^/get_grid_info").Match(uri).Success) {
+            }
+            else if (new Regex(@"^/https?:/.*$").Match(uri).Success)
+            {
+                //This is a libomv client and the proxy CAPS URI has been munged by the C# URI class
+                //Part of the LIBOMV-457 work around, TODO make this much nicer.
+                uri = uri.Replace(":/", "://");
+                ProxyCaps(netStream, meth, uri.Substring(1), headers, content, reqNo);
+            }
+            else if (new Regex(@"^/get_grid_info").Match(uri).Success) {
                 ProxyGetGridInfo(netStream, meth, uri, headers, content, reqNo);
-            } else {
+            } 
+            else {
                 OpenMetaverse.Logger.Log("404 not found: " + uri, Helpers.LogLevel.Error);
                 byte[] wr = Encoding.ASCII.GetBytes("HTTP/1.0 404 Not Found\r\nContent-Length: 0\r\n\r\n");
                 netStream.Write(wr, 0, wr.Length);
