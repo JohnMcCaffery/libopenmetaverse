@@ -78,6 +78,12 @@ namespace GridProxy
         /// The URI of the login server
         /// </summary>
         public Uri remoteLoginUri = new Uri("https://login.agni.lindenlab.com/cgi-bin/login.cgi");
+        /// <summary>
+        /// Whether to proxy CAPS requests or let them go direct to the server.
+        /// True = intercept CAPS requests.
+        /// False = Let CAPS requests go direct to the server.
+        /// </summary>
+        public bool ProxyCaps;
 
         /// <summary>
         /// construct a default proxy configuration with the specified userAgent and author
@@ -107,6 +113,7 @@ namespace GridProxy
             argumentParsers["proxy-client-facing-address"] = new ArgumentParser(ParseClientFacingAddress);
             argumentParsers["proxy-remote-facing-address"] = new ArgumentParser(ParseRemoteFacingAddress);
             argumentParsers["proxy-remote-login-uri"] = new ArgumentParser(ParseRemoteLoginUri);
+            argumentParsers["proxy-caps"] = new ArgumentParser(ParseProxyCAPS);
 
             foreach (string arg in args)
             {
@@ -144,6 +151,7 @@ namespace GridProxy
             Console.WriteLine("  --proxy-client-facing-address=<IP>  communicate with client via <IP>");
             Console.WriteLine("  --proxy-remote-facing-address=<IP>  communicate with server via <IP>");
             Console.WriteLine("  --proxy-remote-login-uri=<URI>      use SL login server at <URI>");
+            Console.WriteLine("  --proxy-caps                        True/False - If true CAPS requests will be intercepted by the proxy. False they will go direct to the server.");
             Console.WriteLine("  --log-all                           log all packets by default in Analyst");
             Console.WriteLine("  --log-whitelist=<file>              log packets listed in file, one name per line");
             Console.WriteLine("  --no-log-blacklist=<file>           don't log packets in file, one name per line");
@@ -170,6 +178,11 @@ namespace GridProxy
         private void ParseRemoteLoginUri(string value)
         {
             remoteLoginUri = new Uri(value);
+        }
+
+        private void ParseProxyCAPS(string value)
+        {
+            ProxyCaps = bool.Parse(value);
         }
     }
 
@@ -1279,7 +1292,7 @@ namespace GridProxy
                 // start a new proxy session
                 Reset();
 
-                if (responseData.Contains("seed_capability"))
+                if (responseData.Contains("seed_capability") && proxyConfig.ProxyCaps)
                 {
                     CapInfo info = new CapInfo((string)responseData["seed_capability"], activeCircuit, "SeedCapability");
                     info.AddDelegate(new CapsDelegate(FixupSeedCapsResponse));
