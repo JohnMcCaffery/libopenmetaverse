@@ -142,9 +142,8 @@ namespace OpenMetaverse
         DenyTeleport = 24,
         /// <summary>Only useful if you have Linden permissions</summary>
         GodLikeRequestTeleport = 25,
-        /// <summary>A placeholder type for future expansion, currently not
-        /// used</summary>
-        CurrentlyUnused = 26,
+        /// <summary>Request a teleport lure</summary>
+        RequestLure = 26,
         // <summary>Notification of a new group election, this is 
         // deprecated</summary>
         //[Obsolete]
@@ -4692,6 +4691,7 @@ namespace OpenMetaverse
         /// <param name="metersCredit">The meters credited</param>
         /// <param name="metersCommitted">The meters comitted</param>
         /// <param name="description">A brief description of the transaction</param>
+        /// <param name="transactionInfo">Transaction info</param>
         public MoneyBalanceReplyEventArgs(UUID transactionID, bool transactionSuccess, int balance, int metersCredit, int metersCommitted, string description, TransactionInfo transactionInfo)
         {
             this.m_TransactionID = transactionID;
