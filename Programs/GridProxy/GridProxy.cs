@@ -610,7 +610,7 @@ namespace GridProxy
         }
 
         private void ProxyGetGridInfo(NetworkStream netStream, string meth, string uri, Dictionary<string, string> headers, byte[] content, int reqNo) {
-            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(proxyConfig.remoteLoginUri);
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(proxyConfig.remoteLoginUri + uri.Substring(1));
             req.KeepAlive = false;
 
             foreach (string header in headers.Keys) {
@@ -673,7 +673,7 @@ namespace GridProxy
                 Array.Resize(ref respBuf, length);
 
 
-                consoleMsg += "[" + reqNo + "] Response from " + uri + "\nStatus: " + (int)resp.StatusCode + " " + resp.StatusDescription + "\n";
+                consoleMsg += "[" + reqNo + "] Response from " + req.RequestUri + "\nStatus: " + (int)resp.StatusCode + " " + resp.StatusDescription + "\n";
 
                 {
                     byte[] wr = Encoding.UTF8.GetBytes("HTTP/1.0 " + (int)resp.StatusCode + " " + resp.StatusDescription + "\r\n");
@@ -701,7 +701,12 @@ namespace GridProxy
 
             consoleMsg += "\n" + respString + "\n--------";
             OpenMetaverse.Logger.Log(consoleMsg, Helpers.LogLevel.Debug);
+            string port = new Regex(@"[0-9]:.*/").Match(loginURI).Value.Substring(2).TrimEnd('/');
+            respString = new Regex(@"<gridnick>.*</gridnick>").Replace(respString, "<gridnick>"+port+"</gridnick>");
+            respString = new Regex(@"<gridname>.*</gridname>").Replace(respString, "<gridname>Proxy:"+port+"</gridname>");
+            respString = new Regex(@"<login>.*</login>").Replace(respString, "<login>"+loginURI+"</login>");
             OpenMetaverse.Logger.Log("[" + reqNo + "] Fixed-up response:\n" + respString + "\n--------", Helpers.LogLevel.Debug);
+            respBuf = Encoding.UTF8.GetBytes(respString);
 
             try
             {
