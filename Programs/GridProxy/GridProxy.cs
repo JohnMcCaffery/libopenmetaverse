@@ -662,7 +662,11 @@ namespace GridProxy
                 } else {
                     OpenMetaverse.Logger.Log("Request error", Helpers.LogLevel.Error, e);
                     byte[] wr = Encoding.ASCII.GetBytes("HTTP/1.0 502 Gateway Error\r\nContent-Length: 0\r\n\r\n"); // FIXME
-                    netStream.Write(wr, 0, wr.Length);
+                    try {
+                        netStream.Write(wr, 0, wr.Length);
+                    } catch (IOException ex) {
+                        OpenMetaverse.Logger.Log("Unable to return response to client", Helpers.LogLevel.Error, ex);
+                    }
                     return;
                 }
             }
