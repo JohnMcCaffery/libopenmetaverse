@@ -642,14 +642,22 @@ namespace GridProxy
                 if (e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.SendFailure) {
                     OpenMetaverse.Logger.Log("Request timeout", Helpers.LogLevel.Warning, e);
                     byte[] wr = Encoding.ASCII.GetBytes("HTTP/1.0 504 Proxy Request Timeout\r\nContent-Length: 0\r\n\r\n");
-                    netStream.Write(wr, 0, wr.Length);
+                    try {
+                        netStream.Write(wr, 0, wr.Length);
+                    } catch (Exception ex) {
+                        OpenMetaverse.Logger.Log("Problem returning error message to client.", Helpers.LogLevel.Warning, ex);
+                    }
                     return;
                 } else if (e.Status == WebExceptionStatus.ProtocolError && e.Response != null) {
                     resp = (HttpWebResponse)e.Response;
                 } else {
                     OpenMetaverse.Logger.Log("Request error", Helpers.LogLevel.Error, e);
                     byte[] wr = Encoding.ASCII.GetBytes("HTTP/1.0 502 Gateway Error\r\nContent-Length: 0\r\n\r\n"); // FIXME
-                    netStream.Write(wr, 0, wr.Length);
+                    try {
+                        netStream.Write(wr, 0, wr.Length);
+                    } catch (Exception ex) {
+                        OpenMetaverse.Logger.Log("Problem returning error message to client.", Helpers.LogLevel.Warning, ex);
+                    }
                     return;
                 }
             }
