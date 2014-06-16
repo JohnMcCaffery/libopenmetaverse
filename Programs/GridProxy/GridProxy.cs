@@ -83,7 +83,12 @@ namespace GridProxy
         /// True = intercept CAPS requests.
         /// False = Let CAPS requests go direct to the server.
         /// </summary>
-        public bool ProxyCaps;
+        public bool ProxyCaps = true;
+
+        /// <summary>
+        /// Whether to only proxy event queue caps.
+        /// </summary>
+        public bool ProxyEventQueueOnly = false;
 
         /// <summary>
         /// construct a default proxy configuration with the specified userAgent and author
@@ -114,6 +119,7 @@ namespace GridProxy
             argumentParsers["proxy-remote-facing-address"] = new ArgumentParser(ParseRemoteFacingAddress);
             argumentParsers["proxy-remote-login-uri"] = new ArgumentParser(ParseRemoteLoginUri);
             argumentParsers["proxy-caps"] = new ArgumentParser(ParseProxyCAPS);
+            argumentParsers["proxy-event-queue-only"] = new ArgumentParser(ParseProxyEventQueueOnly);
 
             foreach (string arg in args)
             {
@@ -183,6 +189,10 @@ namespace GridProxy
         private void ParseProxyCAPS(string value)
         {
             ProxyCaps = bool.Parse(value);
+        }
+
+        private void ParseProxyEventQueueOnly(string value) {
+            ProxyEventQueueOnly = bool.Parse(value);
         }
     }
 
@@ -1048,7 +1058,7 @@ namespace GridProxy
                 {
                     string val = m[key].AsString();
 
-                    if (!String.IsNullOrEmpty(val))
+                    if (!String.IsNullOrEmpty(val) && (!proxyConfig.ProxyEventQueueOnly || key.Equals("EventQueueGet")))
                     {
                         if (!KnownCaps.ContainsKey(val))
                         {
