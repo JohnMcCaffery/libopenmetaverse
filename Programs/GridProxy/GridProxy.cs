@@ -1197,7 +1197,7 @@ namespace GridProxy
                     ushort simPort = (ushort)info["SimPort"].AsInteger();
                     string capsURL = info["SeedCapability"].AsString();
 
-                    GenericCheck(ref simIP, ref simPort, ref capsURL, capReq.Info.Sim == activeCircuit);
+                    GenericCheck(ref simIP, ref simPort, ref capsURL, true);
 
                     info["SeedCapability"] = OSD.FromString(capsURL);
                     bytes[0] = (byte)(simIP % 256);
